@@ -26,6 +26,8 @@
 <div><span data-icon="tag"></span><h3>Honest Pricing</h3><p>Prices come straight from our live inventory. When an item is gone, it is gone — stock notes show on the card.</p></div>
 </div></div></section>
 
+<section style="padding-top:0"><div class="wrap"><div class="section-head"><div><h2>From Top Speed</h2><p class="sub">Straight offers and the latest ads from Top Speed Appliance — repair, installation and referral rewards, posted on the official Facebook Page.</p></div></div><div data-tsos-ads-stream data-limit="3"></div></div></section>
+
 <section style="padding-top:0"><div class="wrap"><div class="eco"><h2 style="margin-bottom:6px">Part of the Top Speed Ecosystem</h2><p class="sub">One team for buying, repairing, and earning.</p><div class="eco-grid">
 <div><h3>Repair &amp; Installation</h3><p>Need a repair or a professional install for an appliance you already own?</p><a href="https://topspeedserviceos.com/book">Book a repair →</a></div>
 <div><h3>Sell &amp; List</h3><p>Have something to sell? List it with Pepper Lists and reach local buyers.</p><a href="https://pepperlists.com">Sell on Pepper Lists →</a></div>
@@ -40,6 +42,7 @@
 </div><p style="font-size:13px;margin-top:24px">© Top Speed Appliances — part of Top Speed Service OS.</p></div></footer>
 <a class="speedy-fab" href="https://topspeedserviceos.com/speedy"><span data-icon="chat"></span> Ask Speedy</a>
 <script src="/app.js"></script>
+<script src="/ads-stream.js" defer></script>
 <script>
 document.querySelectorAll('[data-icon]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-icon')); });
 document.getElementById('cat-grid').innerHTML = CATEGORIES.map(function(c){ return '<a class="cat-card" href="/category.html?c=' + c.key + '">' + icon(c.icon) + '<h3>' + c.label + '</h3><p>' + c.blurb + '</p></a>'; }).join('');
