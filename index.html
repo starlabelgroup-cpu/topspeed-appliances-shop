@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Top Speed Appliances — Quality Used Appliances | Coconut Creek, FL</title>
+<meta name="description" content="Top Speed Appliances sells quality used appliances — inspected and tested by Top Speed technicians. Delivery and pickup available on marked items. Call (844) 460-7038.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/styles.css">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Top Speed Appliances","slogan":"The Faster, The Better.","telephone":"+1-844-460-7038","url":"https://topspeedappliances.com","address":{"@type":"PostalAddress","streetAddress":"6810 N State Rd 7, Suite 341","addressLocality":"Coconut Creek","addressRegion":"FL","postalCode":"33073","addressCountry":"US"},"openingHours":"Mo-Fr 08:00-19:00"}</script>
+</head><body>
+<header class="site"><div class="wrap header-in"><a class="logo" href="/"><img src="/assets/logo-symbol.svg" alt="Top Speed Appliances logo"><span><b>TOP SPEED</b><span>APPLIANCES</span></span></a>
+<nav class="main"><a href="/">Shop</a><a href="/#categories">Categories</a><a href="https://topspeedserviceos.com/book">Repair &amp; Installation</a><a href="tel:+18444607038">(844) 460-7038</a><a class="btn" href="/cart.html">Cart <span class="cart-count" id="cart-count">0</span></a></nav></div></header>
+
+<section class="hero"><div class="wrap"><div class="hero-logo"><img src="/assets/logo-lockup.svg" alt="Top Speed Appliances" height="48"></div>
+<div class="eyebrow" style="margin-top:18px">Quality Used Appliances · Coconut Creek, FL</div>
+<h1>Quality used appliances, inspected &amp; tested by Top Speed technicians.</h1>
+<p>Shop refrigerators, washers, dryers, ranges, dishwashers and more. Every listed appliance is inspected and tested before it goes on sale — with delivery and pickup available on marked items.</p>
+<div class="cta"><a class="btn" href="#featured">Shop Appliances</a><a class="btn ghost" href="tel:+18444607038">Call (844) 460-7038</a><a class="btn dark" href="https://topspeedserviceos.com/speedy" style="border:1px solid #555">Ask Speedy</a></div>
+<p style="font-size:14px;margin-top:16px">The Faster, The Better. · Mon–Fri 8am–7pm</p></div></section>
+
+<section id="categories"><div class="wrap"><div class="section-head"><div><h2>Shop by Category</h2><p class="sub">Nine categories — inventory is listed as it becomes available.</p></div></div><div class="grid" id="cat-grid"></div></div></section>
+
+<section id="featured" style="padding-top:0"><div class="wrap"><div class="section-head"><div><h2>Featured Appliances</h2><p class="sub">Live inventory from Top Speed Appliances.</p></div><a class="btn ghost" href="/cart.html">View Cart</a></div><div id="featured-wrap"><p class="sub">Loading inventory…</p></div></div></section>
+
+<section style="padding-top:0"><div class="wrap"><div class="trust">
+<div><span data-icon="truck"></span><h3>Delivery &amp; Pickup</h3><p>Delivery and pickup are available on marked items — each product page shows what applies to that appliance.</p></div>
+<div><span data-icon="shield"></span><h3>Warranty Shown Per Item</h3><p>Warranty days are listed on each product from its actual record — no blanket promises, just what that appliance carries.</p></div>
+<div><span data-icon="wrench"></span><h3>Inspected &amp; Tested</h3><p>Every appliance is inspected and tested by Top Speed technicians before it is listed for sale.</p></div>
+<div><span data-icon="tag"></span><h3>Honest Pricing</h3><p>Prices come straight from our live inventory. When an item is gone, it is gone — stock notes show on the card.</p></div>
+</div></div></section>
+
+<section style="padding-top:0"><div class="wrap"><div class="eco"><h2 style="margin-bottom:6px">Part of the Top Speed Ecosystem</h2><p class="sub">One team for buying, repairing, and earning.</p><div class="eco-grid">
+<div><h3>Repair &amp; Installation</h3><p>Need a repair or a professional install for an appliance you already own?</p><a href="https://topspeedserviceos.com/book">Book a repair →</a></div>
+<div><h3>Sell &amp; List</h3><p>Have something to sell? List it with Pepper Lists and reach local buyers.</p><a href="https://pepperlists.com">Sell on Pepper Lists →</a></div>
+<div><h3>Refer &amp; Earn</h3><p>Refer friends to Top Speed and earn rewards through the referral program.</p><a href="https://topspeedserviceos.com/refer">Refer &amp; Earn →</a></div>
+</div></div></div></section>
+
+<footer class="site"><div class="wrap"><div class="cols">
+<div><h4>Top Speed Appliances</h4><p>The Faster, The Better.<br>Quality used appliances in Coconut Creek, FL.</p></div>
+<div><h4>Visit &amp; Call</h4><p>6810 N State Rd 7, Suite 341<br>Coconut Creek, FL 33073<br><a href="tel:+18444607038">(844) 460-7038</a><br>Mon–Fri 8am–7pm</p></div>
+<div><h4>Shop</h4><p><a href="/#categories">Categories</a><br><a href="/cart.html">Cart</a><br><a href="https://topspeedserviceos.com/speedy">Ask Speedy</a></p></div>
+<div><h4>Top Speed Service OS</h4><p><a href="https://topspeedserviceos.com">topspeedserviceos.com</a><br><a href="https://topspeedserviceos.com/book">Book a Repair</a><br><a href="https://pepperlists.com">Pepper Lists</a></p></div>
+</div><p style="font-size:13px;margin-top:24px">© Top Speed Appliances — part of Top Speed Service OS.</p></div></footer>
+<a class="speedy-fab" href="https://topspeedserviceos.com/speedy"><span data-icon="chat"></span> Ask Speedy</a>
+<script src="/app.js"></script>
+<script>
+document.querySelectorAll('[data-icon]').forEach(function(el){ el.innerHTML = icon(el.getAttribute('data-icon')); });
+document.getElementById('cat-grid').innerHTML = CATEGORIES.map(function(c){ return '<a class="cat-card" href="/category.html?c=' + c.key + '">' + icon(c.icon) + '<h3>' + c.label + '</h3><p>' + c.blurb + '</p></a>'; }).join('');
+fetchCatalog().then(function(products){
+  var w = document.getElementById('featured-wrap');
+  if (!products.length) { w.innerHTML = emptyStateHTML(); return; }
+  w.innerHTML = '<div class="cards">' + products.slice(0, 8).map(productCard).join('') + '</div>';
+  bindAddButtons(products);
+}).catch(function(){ document.getElementById('featured-wrap').innerHTML = emptyStateHTML(); });
+</script></body></html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cart &amp; Checkout — Top Speed Appliances</title><meta name="description" content="Review your cart and check out at Top Speed Appliances. Call (844) 460-7038.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="stylesheet" href="/styles.css"></head><body>
+<header class="site"><div class="wrap header-in"><a class="logo" href="/"><img src="/assets/logo-symbol.svg" alt="Top Speed Appliances logo"><span><b>TOP SPEED</b><span>APPLIANCES</span></span></a>
+<nav class="main"><a href="/">Shop</a><a href="tel:+18444607038">(844) 460-7038</a><a class="btn" href="/cart.html">Cart <span class="cart-count" id="cart-count">0</span></a></nav></div></header>
+<section><div class="wrap"><h2>Your Cart</h2><div id="cart-wrap" style="margin-top:16px"></div>
+<div id="checkout-wrap" style="margin-top:28px"></div><div id="result" style="margin-top:16px"></div></div></section>
+<footer class="site"><div class="wrap"><div class="cols"><div><h4>Top Speed Appliances</h4><p>The Faster, The Better.</p></div><div><h4>Visit &amp; Call</h4><p>6810 N State Rd 7, Suite 341, Coconut Creek, FL 33073<br><a href="tel:+18444607038">(844) 460-7038</a><br>Mon–Fri 8am–7pm</p></div><div><h4>Top Speed Service OS</h4><p><a href="https://topspeedserviceos.com">topspeedserviceos.com</a></p></div></div></div></footer>
+<script src="/app.js"></script>
+<script>
+function renderCart(){
+  var cart = getCart(); var w = document.getElementById('cart-wrap'); var cw = document.getElementById('checkout-wrap');
+  if (!cart.length) { w.innerHTML = '<div class="empty"><h3>Your cart is empty</h3><p>Browse the shop and add an appliance to get started.</p><a class="btn" href="/">Shop Appliances</a></div>'; cw.innerHTML = ''; return; }
+  var rows = cart.map(function(i, idx){
+    return '<tr><td>' + esc(i.title || i.productId) + '</td><td>' + money(i.priceCents) + '</td><td><span class="qty"><button data-dec="' + idx + '" aria-label="Decrease">−</button> ' + i.qty + ' <button data-inc="' + idx + '" aria-label="Increase">+</button></span></td><td><strong>' + money((i.priceCents || 0) * i.qty) + '</strong></td><td><button data-del="' + idx + '" class="btn ghost" style="padding:6px 12px">Remove</button></td></tr>';
+  }).join('');
+  var subtotal = cartSubtotalCents(cart, null);
+  w.innerHTML = '<div style="overflow-x:auto"><table class="cart"><thead><tr><th>Item</th><th>Price</th><th>Qty</th><th>Line Total</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div><p style="text-align:right;font-size:18px"><strong>Subtotal: ' + money(subtotal) + '</strong></p><p class="sub" style="text-align:right;font-size:13px">Subtotal only. If delivery is chosen, delivery is quoted at checkout confirmation — no delivery charge is added here.</p>';
+  cw.innerHTML = '<h3>Checkout</h3><form class="checkout" id="co-form"><label>Full name<input name="name" required autocomplete="name"></label><label>Phone<input name="phone" required type="tel" autocomplete="tel"></label><label>Email<input name="email" required type="email" autocomplete="email"></label><label>Fulfillment<select name="fulfillment"><option value="PICKUP">Pickup — 6810 N State Rd 7, Suite 341, Coconut Creek, FL 33073</option><option value="DELIVERY">Delivery (quoted at checkout confirmation)</option></select></label><label>Notes (optional)<textarea name="notes" rows="3"></textarea></label><button class="btn" type="submit">Place Order</button><p class="sub" style="font-size:13px;margin:0">Your order is confirmed once payment completes. If a payment link is provided, use the Complete Payment button after placing your order.</p></form>';
+  w.querySelectorAll('[data-inc]').forEach(function(b){ b.addEventListener('click', function(){ var c = getCart(); c[+b.getAttribute('data-inc')].qty++; setCart(c); renderCart(); }); });
+  w.querySelectorAll('[data-dec]').forEach(function(b){ b.addEventListener('click', function(){ var c = getCart(); var i = +b.getAttribute('data-dec'); c[i].qty--; if (c[i].qty < 1) c.splice(i, 1); setCart(c); renderCart(); }); });
+  w.querySelectorAll('[data-del]').forEach(function(b){ b.addEventListener('click', function(){ var c = getCart(); c.splice(+b.getAttribute('data-del'), 1); setCart(c); renderCart(); }); });
+  document.getElementById('co-form').addEventListener('submit', submitOrder);
+}
+function submitOrder(e){
+  e.preventDefault();
+  var fd = new FormData(e.target); var cart = getCart(); var result = document.getElementById('result');
+  var payload = { customer: { name: String(fd.get('name') || '').trim(), phone: String(fd.get('phone') || '').trim(), email: String(fd.get('email') || '').trim() }, items: cart.map(function(i){ return { productId: i.productId, qty: i.qty }; }), fulfillment: String(fd.get('fulfillment') || 'PICKUP'), notes: String(fd.get('notes') || '').trim() || undefined };
+  result.innerHTML = '<p class="sub">Placing your order…</p>';
+  fetch(API_BASE + '/api/v1/sales-os/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+    .then(function(r){ if (!r.ok) throw new Error('order ' + r.status); return r.json(); })
+    .then(function(j){
+      var order = (j.data && j.data.order) || {}; var checkout = (j.data && j.data.checkout) || {};
+      var url = checkout.url || checkout.checkoutUrl || checkout.paymentUrl || '';
+      var html = '<div class="notice ok"><strong>Order placed.</strong> Order ID: ' + esc(order.id || '—') + '. Your order is confirmed once payment completes — it is not paid yet.';
+      if (url) html += '<div style="margin-top:12px"><a class="btn" href="' + esc(url) + '">Complete Payment</a></div>';
+      html += '</div>';
+      result.innerHTML = html; setCart([]); renderCart(); result.scrollIntoView();
+    })
+    .catch(function(){ result.innerHTML = '<div class="notice err"><strong>We could not place this order online.</strong> Please call <a href="tel:+18444607038">(844) 460-7038</a> (Mon–Fri 8am–7pm) and we will take your order directly. Your cart has been kept.</div>'; });
+}
+renderCart();
+</script></body></html>
