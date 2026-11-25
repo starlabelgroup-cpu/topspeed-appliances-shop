@@ -41,7 +41,7 @@ Production base: `https://top-speed-service-os.vercel.app`
 
 ## Locked facts used (nothing invented)
 
-Top Speed Appliances · (844) 460-7038 / tel:+18444607038 · Mon–Fri 8am–7pm · 6810 N State Rd 7, Suite 341, Coconut Creek, FL 33073 · "The Faster, The Better." · Booking https://topspeedserviceos.com/book · Ask Speedy = link to https://topspeedserviceos.com/speedy (no widget code copied) · Pepper Lists https://pepperlists.com · Refer https://topspeedserviceos.com/refer.
+Top Speed Appliances · (844) 460-7038 / tel:+18444607038 · Mon–Fri 8am–7pm · Coconut Creek, FL (service-area business — no public street address) · "The Faster, The Better." · Booking https://topspeedserviceos.com/book · Ask Speedy = link to https://topspeedserviceos.com/speedy (no widget code copied) · Pepper Lists https://pepperlists.com · Refer https://topspeedserviceos.com/refer.
 No products, prices, reviews, ratings, or stock invented. No `aggregateRating` (Store JSON-LD on home carries name/slogan/phone/address/hours only). "Only 1 available" badge renders only when `stockQty === 1`. Warranty copy is per-product from `warrantyDays`. Cleanout Vents and Appliance Plus Air appear nowhere (grep-verified). Designed SVG icons only, no emoji as UI icons.
 
 ## Local verification (2026-11-23 ~05:56 EST)
