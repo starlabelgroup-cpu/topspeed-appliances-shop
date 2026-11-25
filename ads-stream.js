@@ -1,100 +1,124 @@
-/* Top Speed Ads — public attraction stream (2026-11-23).
- *
- * One shared include for every Service OS surface: drop
- *   <div data-tsos-ads-stream></div>
- *   <script src="/shared/ads-stream.js" defer></script>
- * (satellite hosts use the absolute flagship URL for the script)
- * and the block renders the Top Speed Ads stream from
- * GET /api/v1/ads-os/stream: the ads-style posts actually published
- * on the official Facebook Page (POSTED ad-format records only, each
- * card linking to the real Facebook post — Rule 1) alongside the
- * standing offer cards (the published flat rate card and the
- * referral rewards terms, served by the API as data).
- *
- * Honesty rules baked in, same as the Facebook feed include:
- *  - the stream serves POSTED records only — posts Pepper actually
- *    published behind Ramone's approval, recorded with their real
- *    facebook.com URLs;
- *  - when no ad post has been posted yet, this renders NOTHING
- *    (no section, no placeholder, no invented posts);
- *  - the offer cards state only the platform's published terms.
- */
+/* Top Speed Ads Library — streaming embed (2026-11-24).
+   The drop-in half of the Flywheel Ads Library: any Top Speed web
+   surface adds
+     <div data-ts-ad data-slot="home" data-platform="flagship"></div>
+     <script src="/ads-stream.js" defer></script>
+   and the slot fills with the next house creative from the managed
+   library (GET /api/v1/ads-os/slot) — service/city matched, fairly
+   rotated, impression counted server-side on serve, clicks routed
+   through the library's counted redirect to the creative's own
+   destination (booking intent lands on /book).
+
+   Slot attributes:
+     data-slot      slot name recorded with the click (required-ish)
+     data-platform  surface name recorded with the click
+     data-service   service slug (refrigerator, washer, …)
+     data-city      city slug (no city-tagged creatives exist yet;
+                    general creatives serve)
+     data-format    "landscape" (default) or "square"
+     data-service-from="#id"  read the service from a <select> on
+                    the page (the /service triage picker) and
+                    re-fill the slot whenever the picker changes
+     data-api       API origin override (satellite surfaces)
+
+   Honesty + safety: an empty or failed slot renders NOTHING (the
+   div stays empty and takes no space) — never a filler, never a
+   fake ad, never a broken layout. All copy comes from the library
+   and is escaped before it touches the DOM. */
 (function () {
-  var API = 'https://top-speed-service-os.vercel.app/api/v1/ads-os/stream';
-  function esc(t) {
-    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+  var API = 'https://top-speed-service-os.vercel.app/api/v1';
+
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
     });
   }
-  function render(container, stream) {
-    var posts = (stream && stream.posts) || [];
-    if (!posts.length) return; // honest empty: no section at all
-    var limit = Number(container.getAttribute('data-limit') || 3);
-    posts = posts.slice(0, Math.max(1, limit));
-    var offers = (stream.offers || []).map(function (o) {
-      var lines = (o.lines || []).map(function (l) { return '<li>' + esc(l) + '</li>'; }).join('');
-      return '<article class="tsas-offer">'
-        + (o.visual ? '<img class="tsas-visual" src="' + esc(o.visual) + '" alt="" loading="lazy">' : '')
-        + '<span class="tsas-kicker">Top Speed offer</span>'
-        + '<h3 class="tsas-title">' + esc(o.title) + '</h3>'
-        + '<ul class="tsas-lines">' + lines + '</ul>'
-        + (o.cta ? '<a class="tsas-cta" href="' + esc(o.cta.url) + '">' + esc(o.cta.label) + '</a>' : '')
-        + '</article>';
-    }).join('');
-    var cards = posts.map(function (p) {
-      var excerpt = String(p.copy || '').replace(/\s+/g, ' ').trim();
-      if (excerpt.length > 220) excerpt = excerpt.slice(0, 217) + '…';
-      var date = '';
-      try { date = new Date(p.postedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch (e) { /* keep blank */ }
-      // A real recorded graphic (mediaUrl) always wins; the Pepper
-      // visual is the designed fallback so every card carries a
-      // graphic (Pepper visuals on every in-house ad, 2026-11-23).
-      var media = p.mediaUrl || p.visual;
-      return '<article class="tsas-card">'
-        + (media ? '<a class="tsas-media" href="' + esc(p.url) + '" target="_blank" rel="noopener"><img src="' + esc(media) + '" alt="" loading="lazy"></a>' : '')
-        + '<div class="tsas-body"><span class="tsas-kicker">Top Speed Ads' + (date ? ' · ' + esc(date) : '') + '</span>'
-        + '<h3 class="tsas-title">' + esc(p.title) + '</h3>'
-        + '<p class="tsas-copy">' + esc(excerpt) + '</p>'
-        + '<a class="tsas-link" href="' + esc(p.url) + '" target="_blank" rel="noopener">See it on Facebook</a></div></article>';
-    }).join('');
-    container.innerHTML = '<section class="tsas" aria-label="Top Speed Ads — offers and latest ads">'
-      + '<div class="tsas-head"><h2>Top Speed Ads — straight offers, real posts</h2>'
-      + '<a class="tsas-page" href="' + esc((stream.page && stream.page.url) || 'https://www.facebook.com/profile.php?id=61596590488055') + '" target="_blank" rel="noopener">Follow Top Speed Appliance on Facebook</a></div>'
-      + '<div class="tsas-grid">' + offers + cards + '</div></section>';
-  }
-  function boot() {
-    var containers = document.querySelectorAll('[data-tsos-ads-stream]');
-    if (!containers.length) return;
-    if (!document.getElementById('tsas-style')) {
-      var style = document.createElement('style');
-      style.id = 'tsas-style';
-      style.textContent = '.tsas{max-width:1120px;margin:34px auto;padding:0 20px}'
-        + '.tsas-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px}'
-        + '.tsas-head h2{font-size:24px;color:#071f4f;margin:0}'
-        + '.tsas-page{font-weight:700;color:#1473ff;font-size:14.5px}'
-        + '.tsas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}'
-        + '.tsas-card,.tsas-offer{background:#fff;border:1px solid #d8e2f2;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}'
-        + '.tsas-offer{border-color:#f0c4c6;background:#fff8f8;padding:16px;gap:8px}'
-        + '.tsas-media img{width:100%;height:auto;display:block}'
-        + '.tsas-visual{width:100%;height:auto;display:block;border-radius:10px}'
-        + '.tsas-body{padding:16px;display:flex;flex-direction:column;gap:8px}'
-        + '.tsas-kicker{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#5a6b82}'
-        + '.tsas-offer .tsas-kicker{color:#b02020}'
-        + '.tsas-title{font-size:17px;color:#071f4f;margin:0;line-height:1.35}'
-        + '.tsas-copy{font-size:14.5px;color:#43536b;line-height:1.55;margin:0}'
-        + '.tsas-lines{margin:0;padding-left:18px;font-size:14.5px;color:#43536b;line-height:1.6}'
-        + '.tsas-link{font-weight:700;color:#e01a22;font-size:14.5px;margin-top:auto}'
-        + '.tsas-cta{font-weight:800;color:#fff;background:#e01a22;border-radius:10px;padding:10px 14px;text-align:center;margin-top:auto;text-decoration:none}';
-      document.head.appendChild(style);
+
+  var SERVICE_SLUGS = {
+    refrigerator: 'refrigerator', fridge: 'refrigerator',
+    washer: 'washer', 'washing machine': 'washer',
+    dryer: 'dryer',
+    oven: 'oven-range', range: 'oven-range', stove: 'oven-range', 'oven/range': 'oven-range',
+    dishwasher: 'dishwasher',
+    freezer: 'freezer-ice-maker', 'ice maker': 'freezer-ice-maker', 'freezer/ice maker': 'freezer-ice-maker',
+    microwave: 'microwave',
+    'garbage disposal': 'garbage-disposal', disposal: 'garbage-disposal',
+    installation: 'installation', install: 'installation',
+  };
+
+  function serviceFromSelect(el, fallback) {
+    if (!el) return fallback || '';
+    var raw = '';
+    if (el.tagName === 'SELECT') {
+      var opt = el.options[el.selectedIndex];
+      raw = (opt && (opt.value || opt.text)) || el.value || '';
+    } else {
+      raw = el.value || el.textContent || '';
     }
-    fetch(API + '?limit=10', { headers: { Accept: 'application/json' } })
-      .then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (j) {
-        if (!j || !j.data) return;
-        Array.prototype.forEach.call(containers, function (c) { render(c, j.data); });
-      })
-      .catch(function () { /* stream unreachable: render nothing */ });
+    var key = String(raw).trim().toLowerCase();
+    return SERVICE_SLUGS[key] || fallback || '';
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+
+  function render(box, ad) {
+    if (!ad) { box.innerHTML = ''; return; }
+    var inner = '';
+    if (ad.kind === 'TEXT') {
+      inner =
+        '<div style="padding:16px 18px">' +
+          '<div style="font-weight:800;font-size:19px;line-height:1.25;color:#fff">' + esc(ad.headline || ad.title) + '</div>' +
+          (ad.subline ? '<p style="margin:8px 0 0;color:#c8d2e0;font-size:14.5px;line-height:1.5">' + esc(ad.subline) + '</p>' : '') +
+          '<span style="display:inline-block;margin-top:12px;background:#e63946;color:#fff;font-weight:700;font-size:14px;padding:9px 16px;border-radius:999px">' + esc(ad.ctaText || 'Learn more') + '</span>' +
+        '</div>';
+    } else if (ad.imageUrl) {
+      inner =
+        '<img src="' + esc(ad.imageUrl) + '" alt="' + esc(ad.imageAlt || ad.title || 'Top Speed Appliance') + '"' +
+        (ad.width ? ' width="' + esc(ad.width) + '"' : '') + (ad.height ? ' height="' + esc(ad.height) + '"' : '') +
+        ' loading="lazy" style="display:block;width:100%;height:auto" />' +
+        '<span style="position:absolute;left:12px;bottom:12px;background:rgba(6,16,32,.82);color:#fff;font-weight:700;font-size:13.5px;padding:8px 14px;border-radius:999px">' + esc(ad.ctaText || 'Book a repair') + ' →</span>';
+    } else {
+      box.innerHTML = '';
+      return;
+    }
+    box.innerHTML =
+      '<a href="' + esc(ad.clickUrl) + '" target="_top" rel="noopener" aria-label="' + esc(ad.title || 'Top Speed Appliance') + '"' +
+      ' style="position:relative;display:block;border-radius:16px;overflow:hidden;background:#0a1a33;border:1px solid rgba(255,255,255,.08);text-decoration:none;box-shadow:0 10px 30px rgba(2,8,23,.35)">' +
+      inner + '</a>';
+  }
+
+  function fill(box) {
+    var api = box.getAttribute('data-api') || API;
+    var fromSel = box.getAttribute('data-service-from');
+    var service = box.getAttribute('data-service') || '';
+    if (fromSel) {
+      var src = document.querySelector(fromSel);
+      service = serviceFromSelect(src, service);
+    }
+    var qs = new URLSearchParams({
+      slot: box.getAttribute('data-slot') || 'slot',
+      platform: box.getAttribute('data-platform') || 'web',
+      format: box.getAttribute('data-format') || 'landscape',
+    });
+    if (service) qs.set('service', service);
+    var city = box.getAttribute('data-city');
+    if (city) qs.set('city', city);
+    fetch(api + '/ads-os/slot?' + qs.toString(), { headers: { Accept: 'application/json' } })
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (body) { render(box, body && body.data ? body.data : null); })
+      .catch(function () { /* dark on failure — the slot stays empty */ });
+  }
+
+  function init() {
+    var boxes = document.querySelectorAll('[data-ts-ad]');
+    boxes.forEach(function (box) {
+      fill(box);
+      var fromSel = box.getAttribute('data-service-from');
+      if (fromSel) {
+        var src = document.querySelector(fromSel);
+        if (src) src.addEventListener('change', function () { fill(box); });
+      }
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();
